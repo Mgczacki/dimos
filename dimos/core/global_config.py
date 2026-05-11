@@ -37,6 +37,7 @@ class GlobalConfig(BaseSettings):
     xarm6_ip: str | None = None
     can_port: str | None = None
     simulation: bool = False
+    simulator: str | None = None
     replay: bool = False
     replay_db: str = "go2_short"
     new_memory: bool = False
@@ -83,9 +84,20 @@ class GlobalConfig(BaseSettings):
     def unitree_connection_type(self) -> str:
         if self.replay:
             return "replay"
+        if self.simulator:
+            return self.simulator
         if self.simulation:
             return "mujoco"
         return "webrtc"
+
+    @property
+    def effective_simulator(self) -> str | None:
+        """Resolved simulator backend from --simulator or --simulation."""
+        if self.simulator:
+            return self.simulator
+        if self.simulation:
+            return "mujoco"
+        return None
 
     @property
     def mujoco_start_pos_float(self) -> tuple[float, float]:

@@ -37,7 +37,8 @@ from dimos.perception.detection.type.detection2d.imageDetections2D import ImageD
 from dimos.perception.detection.type.detection3d.imageDetections3DPC import ImageDetections3DPC
 from dimos.perception.detection.type.detection3d.pointcloud import Detection3DPC
 from dimos.protocol.tf.tf import TF
-from dimos.robot.unitree.go2 import connection
+from dimos.robot.unitree.go2.camera import _camera_info_static
+from dimos.robot.unitree.go2.connection_webrtc import Go2WebRtcConnection
 from dimos.robot.unitree.type.odometry import Odometry
 from dimos.utils.data import get_data
 
@@ -101,7 +102,7 @@ def get_moment(tf):
         if odom_frame is None:
             raise ValueError("No odom frame found")
 
-        transforms = connection.GO2Connection._odom_to_tf(odom_frame)
+        transforms = Go2WebRtcConnection._odom_to_tf(odom_frame)
 
         tf.receive_transform(*transforms)
 
@@ -109,7 +110,7 @@ def get_moment(tf):
             "odom_frame": odom_frame,
             "lidar_frame": lidar_frame,
             "image_frame": image_frame,
-            "camera_info": connection._camera_info_static(),
+            "camera_info": _camera_info_static(),
             "transforms": transforms,
             "tf": tf,
         }
@@ -266,8 +267,8 @@ def object_db_module(get_moment):
 
     c = mock.create_autospec(CameraInfo, spec_set=True, instance=True)
     module2d = Detection2DModule(detector=lambda: Yolo2DDetector(device="cpu"), camera_info=c)
-    module3d = Detection3DModule(camera_info=connection._camera_info_static())
-    moduleDB = ObjectDBModule(camera_info=connection._camera_info_static())
+    module3d = Detection3DModule(camera_info=_camera_info_static())
+    moduleDB = ObjectDBModule(camera_info=_camera_info_static())
 
     # Process 5 frames to build up object history
     for i in range(5):

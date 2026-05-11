@@ -34,7 +34,7 @@ class DimosCliCall:
             args = ["run", *args]
 
         self.process = subprocess.Popen(
-            ["dimos", "--simulation", *args],
+            ["dimos", "--simulator=mujoco", *args],
             start_new_session=True,
         )
 
